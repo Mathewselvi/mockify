@@ -14,6 +14,32 @@ app.use(cors({
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
+// DB Connection Check Middleware
+app.use(async (req, res, next) => {
+    // Skip DB check for preflight requests
+    if (req.method === 'OPTIONS') return next();
+
+    if (mongoose.connection.readyState === 1) {
+        return next();
+    }
+
+    try {
+        if (!process.env.MONGO_URI) {
+            throw new Error('MONGO_URI is not defined');
+        }
+        // Force connect if not connected
+        await mongoose.connect(process.env.MONGO_URI);
+        next();
+    } catch (err) {
+        console.error('DB Connection Error:', err);
+        res.status(500).json({
+            message: 'Database connection failed',
+            error: err.message,
+            hint: 'Check MONGO_URI and MongoDB Atlas IP Whitelist (0.0.0.0/0)'
+        });
+    }
+});
+
 // Routes
 const questionRoutes = require('./routes/questions');
 const interviewRoutes = require('./routes/interviews');
