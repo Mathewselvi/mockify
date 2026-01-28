@@ -1,9 +1,20 @@
 import axios from 'axios';
 
 const getBaseUrl = () => {
-    const envUrl = import.meta.env.VITE_API_URL;
+    let envUrl = import.meta.env.VITE_API_URL;
     if (!envUrl) return 'http://localhost:5001/api';
-    return envUrl.endsWith('/api') ? envUrl : `${envUrl}/api`;
+
+    // Remove trailing slash if present to avoid double slashes
+    if (envUrl.endsWith('/')) {
+        envUrl = envUrl.slice(0, -1);
+    }
+
+    // Check if it already ends with /api (handling both cases)
+    if (envUrl.endsWith('/api')) {
+        return envUrl;
+    }
+
+    return `${envUrl}/api`;
 };
 
 const api = axios.create({

@@ -8,7 +8,11 @@ const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+    origin: '*', // Allow all origins for now to prevent blocking
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
 // Routes
 const questionRoutes = require('./routes/questions');
