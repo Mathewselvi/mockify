@@ -1,7 +1,13 @@
 import axios from 'axios';
 
+const getBaseUrl = () => {
+    const envUrl = import.meta.env.VITE_API_URL;
+    if (!envUrl) return 'http://localhost:5001/api';
+    return envUrl.endsWith('/api') ? envUrl : `${envUrl}/api`;
+};
+
 const api = axios.create({
-    baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5001/api',
+    baseURL: getBaseUrl(),
 });
 
 export const startInterview = (data) => api.post('/interviews/start', data);
