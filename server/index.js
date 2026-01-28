@@ -26,22 +26,27 @@ app.get('/', (req, res) => {
 });
 
 // Database Connection
+// Database Connection
 const connectDB = async () => {
     try {
+        if (mongoose.connection.readyState >= 1) {
+            return;
+        }
         await mongoose.connect(process.env.MONGO_URI);
         console.log('MongoDB Connected');
     } catch (err) {
         console.error('MongoDB Connection Error:', err.message);
-        process.exit(1);
+        // Do not exit process in serverless environment
     }
 };
 
-// Start Server
+// Connect to DB immediately
+connectDB();
+
+// Start Server (only if run directly)
 if (require.main === module) {
-    connectDB().then(() => {
-        app.listen(PORT, () => {
-            console.log(`Server running on port ${PORT}`);
-        });
+    app.listen(PORT, () => {
+        console.log(`Server running on port ${PORT}`);
     });
 }
 
